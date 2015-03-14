@@ -1,0 +1,474 @@
+
+#include"str.h"
+
+//自己实现字符串查找
+char * MyStrstrFind(const char const * string, char * str)
+{
+	//char *p = string;
+	char *backupString = string;//备份
+	char *findAddr = NULL;      //要返回的结果
+	
+	while (*backupString != '\0')
+	{
+		char *nowBackupString = backupString;//里面每次和要查找的字符相比较的副本，自加时不会影响外面的循环
+		int flag = 1;  //假定一开始为真
+		char *backupStr = str;//备份
+		
+		while (*backupStr != '\0')
+		{
+			
+			if (*nowBackupString != '\0')    //由于nowBackupString也自加，所以要判断是否到结尾
+			{
+				if (*nowBackupString != *backupStr) //如果其中的一个字符不相等，侧不相等
+				{
+					flag = 0;
+					//printf("%d\n", flag);
+				}
+				//printf("%d\n", flag);
+				backupStr++;    //向前移动
+				nowBackupString++;//向前移动
+
+			}
+			else
+			{
+				flag = 0;       //如果nowBackupString到结尾，侧跳出
+				break;
+			}
+			
+			
+		}
+		//flag = 0;
+		if (flag == 1)
+		{
+			findAddr = backupString;//-(MyStrlen(str));
+			//printf("%s\n", findAddr);
+			return findAddr;
+		}
+		backupString++;//向前移动一位
+
+	}
+
+	return NULL;//如果前面没有跳出，侧是全部循环完了，没有找到；
+
+}
+
+//自己实现字符查找
+char *MyStrstr(const char const *string, char ch)
+{
+	
+	char *p = string;  //不修改string的值
+
+	char *targ = NULL; //返回值
+	if (*p == NULL || ch == NULL )    //其中有一个为空时，侧不需要查找
+	{
+		return targ;
+	}
+		
+	else
+	{
+		while (*p != '\0')            //一直循环下去查找下去
+		{
+			//printf("%c\n", *p);
+			if (*p == ch)
+			{
+				targ = p;
+				return targ;
+			}
+			p++; //指向下一个字符
+			
+		}
+	}
+
+}
+
+//自己实现字符串尾部增加（拼接）
+char *MyStrcut(char *target, const char *source)//使用const，防止意外修改数据
+{
+	if (source == NULL)   //如果两个指针有其中一个为空，侧为失败
+	{
+		return target;
+	}
+	else
+	{
+		    char * BackupTarget = target;//存储首地址，以便返回
+		
+			while (*target != '\0') //把指针移动到末尾处
+			{
+				target++;
+			}
+
+			while (*source != '\0')//开始拼接
+			{
+				*target = *source;
+				target++;
+				source++;
+			}
+			*target = '\0';
+			return BackupTarget;
+
+			
+		}
+		
+
+		
+	
+	
+}
+
+
+//自己实现求字符串拷贝
+char *MyStrcpy(char *target, const char *source)//使用const，防止意外修改数据
+{
+	if (target == NULL || source == NULL)   //如果两个指针有其中一个为空，侧为失败
+	{
+		return NULL;
+	}
+	else
+	{
+		char * TargetBackup = target;    //备份首地址，因为返回的是拷贝到目标的首地址
+		while (*source != '\0')
+		{
+			*target = *source;
+			target++;
+			source++;
+
+		}
+		*target = '\0';         //加上结束符
+		return  TargetBackup;
+	}
+}
+
+//自己实现求字符串长度
+int MyStrlen(char *p)
+{
+	if (p == NULL)   //如果P为空，侧没有内容，不必开工了
+	{
+		return -1;
+	}
+	else
+	{
+
+		int length = 0;
+		while (*p != '\0')
+		{
+			length++;
+			p++;
+		}
+		return length;
+	}
+}
+
+//原封不动清零
+void Init(myStr  *string)
+{
+
+	string->p = NULL;
+	string->realLength = 0;
+	
+
+}
+     
+//初始化实际长度，开辟内存
+void InitWithLenght(myStr *string, int length)
+{
+	//string->p = (char *)malloc(length * sizeof(char));  //malloc分配的内存里面不一定为零，所以不够安全
+	  string->p = calloc(length, sizeof(char));           //calloc分配的内存里面不一定为零，所以不够安全
+	  string->realLength = length;
+}
+
+
+//初始化并拷贝字符
+void InitWithString(myStr *string, char *copystring)   
+{
+	int length = MyStrlen(copystring);                     //获取字符长度
+	string->p = (char *)calloc(length+1, sizeof(char));  //strlen获取长度时不包括\0,所以要+1
+	MyStrcpy(string->p,copystring);                        //拷贝字符串
+	
+	//如果使用的malloc,后面必须加上'\0',calloc可以不用加，因为分配内存时已经全部为0了
+	*(string->p + length) = '\0';
+
+
+}
+
+//打印
+void Print(myStr *string)
+{
+
+
+    
+	//printf("%s\n",string->p);
+
+}
+//尾部增加字符
+void TailAddChar(myStr *string, char ch)
+{
+	if (MyStrlen(string->p) + 1 == string->realLength)          //当目标字符串已经满的时候，重新分配内存
+	{
+		string->p = (char *)realloc(string->p, string->realLength + 1);
+		string->p[string->realLength - 2] = ch;
+		string->p[string->realLength - 1] = '\0';
+		string->realLength += 1;
+		printf("%c\n", ch);
+	}
+
+	else                                            //内存没有满时不用重新分配
+	{
+	   
+		string->p[MyStrlen(string->p)] = ch;       //string->p[MyStrlen(string->p)+1] = ch;这样子是错误的，因为数组是从0开始的，
+		string->p[MyStrlen(string->p) + 1] = '\0'; //如第9个元素就是a[8],,所以不用加1
+		string->realLength += 1;                   //实际长度要加1；
+
+
+	}
+}
+
+//尾部增加字符串
+void TailAddString(myStr *target, char *source)
+{
+	
+	target->realLength = MyStrlen(target->p);
+	printf("%d\n", target->realLength);
+
+   // MyStrcat(&string, &str);
+	if (source == NULL)   //如果两个指针有其中一个为空，侧为失败
+	{
+		return target;
+	}
+	else
+	{
+		if (MyStrlen(target->p) + MyStrlen(source) > target->realLength)
+		{
+
+			target->p = (char *)realloc(target->p, MyStrlen(target->p) + MyStrlen(source) + 1);
+
+			MyStrcut(target->p, source);
+			
+		}
+		else
+		{
+			MyStrcut(target->p, source);
+		
+		}
+
+	}
+	
+
+		
+	
+
+}
+
+char *FindChar(myStr *string, char ch)
+{
+	//printf("%s\n", string->p);
+	char *p = MyStrstr(string->p, ch);
+	//printf("%p", p);
+	return p;
+}
+
+
+
+char * MYFindString(myStr *string, char * str)
+{
+	return MyStrstrFind(string->p, str);
+	//printf("%s\n", MyStrstrFind(string->p, str));// MyStrstrFind(string->p, str);
+}
+
+//执行指令
+void Run(myStr *string)
+{
+	
+	system(string);
+}
+
+//自己实现字符删除函数
+char *DeleteChar(myStr *string,char findchar)
+{
+
+	if (string == NULL || findchar == NULL)
+	{
+		return NULL;
+	}
+
+	char *position = MyStrstr(string->p, findchar);
+	//printf("%s\n",position);
+	char *p = position+1;
+	if (*position != NULL)
+	{
+		int length = MyStrlen(position);
+
+		while (*p != '\0')
+		{
+			*position = *p;
+			position ++ ;
+			p++;
+		}
+		//printf("%s\n",string->p);
+		return string->p;
+	}
+	else
+	{
+		return NULL; 
+	}
+
+}
+
+//自己实现字符串删除函数
+char *DeleteString(myStr *string, char *findString)
+{
+	if (string == NULL || findString == NULL)
+	{
+		return NULL;
+	}
+
+	char *position = MyStrstrFind(string->p, findString);//依赖查找函数
+	int length = MyStrlen(findString); //求出要删除的字符串的长度
+	//printf("strin = %s\n", position);
+
+	char *pp = position + length;
+	//printf("strip = %s\n", p);
+	if (*position != NULL)      //空侧不执行
+	{
+		if (*pp == '\0')
+		{
+			*position = '\0';//如果删除的是最末尾的字符串，侧直接在位置上插入'\0'
+			return string->p;
+		}
+		else
+		{
+		
+		while (*pp != '\0')
+		{
+			*position = *pp;
+			position++;
+			pp++;
+			//printf("strip0s = %s\n", position);
+
+		}
+		//printf("%s\n",string->p);
+		*position = '\0';
+		//printf("%s\n", string->p);
+		return string->p;
+		}
+	}
+	else
+	{
+		return NULL;
+	}
+}
+    
+char *RandoAddChar(myStr *string, char insert, char findPoistion)
+{
+	if (*string->p != '\0' || findPoistion != '\0')
+	{
+		//printf("%c\n",findPoistion);
+	
+		string->realLength = MyStrlen(string->p);
+		printf("%d\n", string->realLength);
+		char *position = MyStrstr(string->p, findPoistion);
+		if (*position != '\0')
+		{
+			//printf("%c\n", findPoistion);调试用 //如果之前的字符串没满，就不用分配内存
+			if (*(string->p + string->realLength + 1) < string->realLength)
+			{
+				//printf("代表没满：%c\n", findPoistion);调试用
+				int i = MyStrlen(position);//求出要移动的字符个数
+				char *j = position; //要插入的位置
+				j += i + 1; //从最后一个开始挪动
+				for (i = MyStrlen(position); i >= 0;i--)
+				{
+					*j = *(j - 1);//后一个等于前一个，实现挪动
+					j--;
+
+				}
+				i = MyStrlen(position);//重新等于要移动的字符个数，以便后面使用
+				*j = insert;//实现插入
+				*(position + i + 1) = '\0';//添加结束符
+				return string->p;
+			}
+			else
+			{
+				//已经满了，要重新分配内存
+				string->p = (char *)realloc(string->p, MyStrlen(string->p) + 1);
+				int i = MyStrlen(position);//求出要移动的字符个数
+				char *j = position;//要插入的位置
+				j += i + 1;//从最后一个开始挪动
+				for (i = MyStrlen(position); i >= 0; i--)
+				{
+
+					*j = *(j - 1); //后一个等于前一个，实现挪动
+					//调试用 printf("%c\n", *j);
+					j--;
+
+				}
+				*j = insert;
+				i = MyStrlen(position);
+				*(position + i + 1) = '\0';
+				return string->p;
+
+			}
+		}
+
+		else
+		{
+			return NULL;
+		}
+
+	}
+	else
+	{
+		return NULL;
+	}
+}
+
+
+char *RandoAddString(myStr *string, char *insertString, char findPoistion)
+{
+	if (*string->p != NULL || findPoistion != NULL)
+	{
+		char * position = NULL;//发行版必须先初始化
+		
+		 position = MyStrstr(string->p, findPoistion);//先查找是否为空
+		if (position != NULL)
+		{
+			
+			string->p = (char *)realloc(string->p, MyStrlen(string->p) + MyStrlen(insertString) + 1);//直接分配内存，不再去检测
+			position = MyStrstr(string->p, findPoistion); //找出要插入的位置
+			//position = MyStrstr(string->p, findPoistion);
+			//printf("第一定位：%s\n", position);
+			int num;
+			
+			char *move = string->p+(MyStrlen(string->p)+ MyStrlen(insertString));//等于原来最后一个字符，从那里开始拷贝
+
+			//printf("第一定位：%s\n", move);
+			for (num = MyStrlen(position); num >= 0; num--)
+			{
+				*move = *(move - MyStrlen(insertString));    //最后一个等于他前（要插入字符的个数）
+				move--;
+
+			}
+
+			int num2;
+			
+			for (num2 = MyStrlen(insertString); num2 > 0;num2--)
+			{
+				*position++ = *insertString++;  //实现插入
+			}
+
+			*(string->p+(MyStrlen(string->p)+1 ))= '\0';//插入结束符;
+			printf("%s\n", string->p);
+			return string->p;//返回
+
+		}
+		else
+		{
+			return NULL;
+		}
+
+	}
+	else
+	{
+		return NULL;
+	}
+}
+
